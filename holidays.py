@@ -5,36 +5,29 @@ from bs4 import BeautifulSoup
 from datetime import datetime, date, timedelta
 
 
-# def scrape_holidays(url, area):
-#     filename = f"data/{area}.json"
-#     if area not in os.listdir("data"):
-#         response = requests.get(url)
-#         soup = BeautifulSoup(response.text, "lxml")
-#         rows = soup.find("tbody").find_all("tr", {"class": ["odd", "even"]})
-#         content = dict()
-#         
-#         for row in rows:
-#             cols = row.find_all("td")
-#             holidate = datetime.strptime(cols[0].text + " 2020", "%d %b %Y").strftime("%Y-%m-%d %A")
-#             if holidate not in content:
-#                 events = []
-#             if len(cols) > 3:
-#                 events.append({"event": cols[2].text, "scope": cols[3].text})
-#                 content.update({holidate: events})
-#             else:
-#                 events.append({"event": cols[2].text})
-#                 content.update({holidate: events})
-#         
-#         with open(filename, "w") as json_file:
-#             json.dump({area: content}, json_file)
-# 
-# scrape_holidays("https://publicholidays.ph/2020-dates/", "philippines")
-# """
-# URLS:
-#   - https://publicholidays.com.my/2020-dates/
-#   - https://publicholidays.ph/2020-dates/
-#   - https://publicholidays.us/ohio/2020-dates/
-# """
+def scrape_holidays(url, area):
+    filename = f"data/{area}.json"
+    if area not in os.listdir("data"):
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, "lxml")
+        rows = soup.find("tbody").find_all("tr", {"class": ["odd", "even"]})
+        content = dict()
+        
+        for row in rows:
+            cols = row.find_all("td")
+            holidate = datetime.strptime(cols[0].text + " 2020", "%d %b %Y").strftime("%Y-%m-%d %A")
+            if holidate not in content:
+                events = []
+            if len(cols) > 3:
+                events.append({"event": cols[2].text, "scope": cols[3].text})
+                content.update({holidate: events})
+            else:
+                events.append({"event": cols[2].text})
+                content.update({holidate: events})
+        
+        with open(filename, "w") as json_file:
+            json.dump({area: content}, json_file)
+
 
 def get_weekends():
     days_in_year = (date(2020, 12, 31) - date(2020, 1, 1)).days
@@ -56,28 +49,74 @@ def get_holidays(area):
     return holidays
 
 
+def get_long_weekends(weekends, holidays):
+    holidays.extend(weekends)
+    holidays = sorted(list(set(holidays)))
+    days = 0
+    ranges = []
+
+    # Check for long holidays/weekends greater than or equal to three days
+    for day in holidays:
+        days += 1
+        if days == 1:
+            from_date = day
+        next_day = (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).date()
+        if str(next_day) not in holidays:
+            to_date = next_day - timedelta(days=1)
+            if days >= 3:
+                ranges.append((str(from_date.replace(" 00:00:00", "")), str(to_date).replace(" 00:00:00", "")))
+            days = 0
+    return ranges
+
+
+def get_potential_VL(weekends, holidays):
+    holidays.extend(weekends)
+    holidays = sorted(list(set(holidays)))
+    days = 0
+    ranges = []
+
+    # Check for long holidays/weekends greater than or equal to three days
+    for day in holidays:
+        days += 1
+        if days == 1:
+            from_date = day
+        next_day = (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).date()
+        if str(next_day) not in holidays:
+            to_date = next_day - timedelta(days=1)
+            ranges.append((str(from_date.replace(" 00:00:00", "")), str(to_date).replace(" 00:00:00", "")))
+            days = 0
+    return ranges
+
+
 weekends = get_weekends()
 holidays = get_holidays("malaysia")
 holidays.extend(weekends)
-holidays = list(set(holidays))
-holidays.sort()
-days = 0
-from_date = 0
-total = 0
-dates = []
+holidays = sorted(list(set(holidays)))
 
-# Check for long holidays/weekends greater than or equal to three days
-for day in holidays:
-    days += 1
-    if days == 1:
-        from_date = day
-    next_day = (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).date()
-    if str(next_day) not in holidays:
-        to_date = next_day - timedelta(days=1)
-        if days >= 3:
-            total += days
-            dates.append((str(days) + " days: " + str(from_date.replace(" 00:00:00", "")) + " - " + str(to_date).replace(" 00:00:00", "")).replace("-", "/"))
-        days = 0
+pairs = get_potential_VL(weekends, holidays)
+a = 0
 
-for dt in dates:
-    print(dt.replace("2020/", "").replace(" / ", " - "))
+for from_date1, to_date1 in pairs:
+    a += 1
+    b = 0
+    for from_date2, to_date2 in pairs:
+        b += 1
+        if b - a == 1:
+            difference = (datetime.strptime(from_date2, "%Y-%m-%d") - datetime.strptime(to_date1, "%Y-%m-%d")).days
+            if difference <= 3: # the lesser, the better
+                total = (datetime.strptime(to_date1, "%Y-%m-%d") - datetime.strptime(from_date1, "%Y-%m-%d")).days
+                total += (datetime.strptime(to_date2, "%Y-%m-%d") - datetime.strptime(from_date2, "%Y-%m-%d")).days
+                total += difference
+                print("HOLIDAY 1:", from_date1, to_date1)
+                print("HOLIDAY 2:", from_date2, to_date2)
+                print("BETWEEN:", difference, "VL(s) needed. Total of", total, "vacation days.")
+
+# Compute value by how many total vacation days can be achieved in how little VL needed to be filed.
+
+
+
+
+
+
+
+
