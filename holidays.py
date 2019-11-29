@@ -36,7 +36,7 @@ def get_weekends():
         weekend = date(2020, 1, 1) + timedelta(days=day)
         weekend = weekend.strftime("%Y-%m-%d %A").split()
         if weekend[-1] in ["Saturday", "Sunday"]:
-            weekends.append(weekend[0])
+            weekends.append(datetime.strptime(weekend[0], "%Y-%m-%d").date())
     return weekends
 
 
@@ -45,78 +45,48 @@ def get_holidays(area):
     holidays = list()
     with open(filename, "r") as json_file:
         for holiday in json.load(json_file).get(area):
-            holidays.append(datetime.strptime(holiday, "%Y-%m-%d %A").strftime("%Y-%m-%d"))
+            holiday = datetime.strptime(holiday, "%Y-%m-%d %A").strftime("%Y-%m-%d")
+            holidays.append(datetime.strptime(holiday, "%Y-%m-%d").date())
     return holidays
 
 
-def get_long_weekends(weekends, holidays):
+def get_free_time(weekends, holidays):
     holidays.extend(weekends)
     holidays = sorted(list(set(holidays)))
     days = 0
-    ranges = []
+    free_time = []
+    long_weekends = []
 
     # Check for long holidays/weekends greater than or equal to three days
     for day in holidays:
         days += 1
         if days == 1:
             from_date = day
-        next_day = (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).date()
-        if str(next_day) not in holidays:
+        next_day = day + timedelta(days=1)
+        if next_day not in holidays:
             to_date = next_day - timedelta(days=1)
+            free_time.append((from_date, to_date))
             if days >= 3:
-                ranges.append((str(from_date.replace(" 00:00:00", "")), str(to_date).replace(" 00:00:00", "")))
+                long_weekends.append((from_date, to_date))
             days = 0
-    return ranges
-
-
-def get_potential_VL(weekends, holidays):
-    holidays.extend(weekends)
-    holidays = sorted(list(set(holidays)))
-    days = 0
-    ranges = []
-
-    # Check for long holidays/weekends greater than or equal to three days
-    for day in holidays:
-        days += 1
-        if days == 1:
-            from_date = day
-        next_day = (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).date()
-        if str(next_day) not in holidays:
-            to_date = next_day - timedelta(days=1)
-            ranges.append((str(from_date.replace(" 00:00:00", "")), str(to_date).replace(" 00:00:00", "")))
-            days = 0
-    return ranges
+    return free_time, long_weekends
 
 
 weekends = get_weekends()
 holidays = get_holidays("malaysia")
-holidays.extend(weekends)
-holidays = sorted(list(set(holidays)))
-
-pairs = get_potential_VL(weekends, holidays)
+pairs = get_free_time(weekends, holidays)[0]
+suggestions = []
 a = 0
-
 for from_date1, to_date1 in pairs:
     a += 1
     b = 0
     for from_date2, to_date2 in pairs:
         b += 1
         if b - a == 1:
-            difference = (datetime.strptime(from_date2, "%Y-%m-%d") - datetime.strptime(to_date1, "%Y-%m-%d")).days
-            if difference <= 3: # the lesser, the better
-                total = (datetime.strptime(to_date1, "%Y-%m-%d") - datetime.strptime(from_date1, "%Y-%m-%d")).days
-                total += (datetime.strptime(to_date2, "%Y-%m-%d") - datetime.strptime(from_date2, "%Y-%m-%d")).days
-                total += difference
-                print("HOLIDAY 1:", from_date1, to_date1)
-                print("HOLIDAY 2:", from_date2, to_date2)
-                print("BETWEEN:", difference, "VL(s) needed. Total of", total, "vacation days.")
+            leaves = (from_date2 - to_date1).days
+            if leaves <= 5: # the lesser, the better
+                vacation_days = (to_date1 - from_date1).days + (to_date2 - from_date2).days + leaves
+                if vacation_days - leaves > 1:
+                    suggestions.append((vacation_days, leaves, from_date1, to_date2))
 
-# Compute value by how many total vacation days can be achieved in how little VL needed to be filed.
-
-
-
-
-
-
-
-
+print(suggestions)
