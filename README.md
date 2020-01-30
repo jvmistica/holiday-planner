@@ -1,11 +1,15 @@
 # Holiday Planner
-## Scrapes holiday dates, checks for long weekends, and suggests efficient leave filing to get the longest vacation days.
+Scrapes holiday dates, checks for long weekends, and suggests efficient leave filing to get the longest vacation days.
+Vacation leave suggestions and schedules are posted to a Trello board where they can be further reviewed.
 
-### Methods
-**scrape_holidays**\
-**get_weekends**\
-**get_holidays**\
-**get_free_time**\
-**create_board**\
-**create_list**\
-**create_card**
+## Getting Started
+
+Install the required modules:
+```
+pip install -r requirements.txt
+```
+
+Run the main script:
+```
+python holidays.py
+```
