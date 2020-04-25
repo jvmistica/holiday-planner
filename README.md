@@ -9,7 +9,14 @@ Install the required modules:
 pip install -r requirements.txt
 ```
 
+Get your key and token from https://trello.com/app-key and modify the trello.py file:
+```
+key = "your_key"
+token = "your_token"
+```
+
 Run the main script:
 ```
 python holidays.py
 ```
+

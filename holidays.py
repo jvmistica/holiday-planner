@@ -24,7 +24,7 @@ for ndx, pair in enumerate(pairs):
 board_id = create_board("Holidays")
 first_four = create_list(board_id, "Jan - Apr", 1)
 second_four = create_list(board_id, "May - Aug", 2)
-last_four = create_list(board_id, "Sep - Dec", 3)
+third_four = create_list(board_id, "Sep - Dec", 3)
 suggestions_list = create_list(board_id, "Suggested Leaves", 4)
 
 # Get suggestions on when to file vacation leaves
@@ -45,4 +45,4 @@ for from_date, to_date in long_weekends:
     elif 5 <= from_date.month <= 8:
         create_card(second_four, content)
     else:
-        create_card(last_four, "{0} days: {1} - {2}")
+        create_card(third_four, content)
