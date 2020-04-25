@@ -17,22 +17,19 @@ def scrape_holidays(url, area):
 
     filename = f"data/{area}.json"
     if area not in os.listdir("data"):
-        response = requests.get(url)
+        response = requests.get(url.replace("<area_name>", area))
+        print(url.replace("<area_name>", area))
         soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("tbody").find_all("tr", {"class": ["odd", "even"]})
+        rows = soup.find("tbody").find_all("tr")
         content = {}
 
         for row in rows:
             cols = row.find_all("td")
-            holidate = datetime.strptime(cols[0].text + " 2020", "%d %b %Y").strftime("%Y-%m-%d %A")
+            holidate = datetime.strptime(row.find("time").get("datetime"), "%Y-%m-%d").strftime("%Y-%m-%d %A")
             if holidate not in content:
                 events = []
-            if len(cols) > 3:
-                events.append({"event": cols[2].text, "scope": cols[3].text})
-                content.update({holidate: events})
-            else:
-                events.append({"event": cols[2].text})
-                content.update({holidate: events})
+            events.append({"event": cols[2].text})
+            content.update({holidate: events})
 
         with open(filename, "w") as json_file:
             json.dump({area: content}, json_file)

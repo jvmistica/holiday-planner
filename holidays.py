@@ -1,10 +1,13 @@
-from scraper import get_weekends, get_holidays, get_free_time
+from scraper import get_weekends, get_holidays, get_free_time, scrape_holidays
 from trello import create_board, create_list, create_card
 
 
 # Retrieve all suggested vacation days
+url = "https://www.officeholidays.com/countries/<area_name>/2020"
+area = "malaysia"
 weekends = get_weekends()
-holidays = get_holidays("malaysia")
+scrape_holidays(url, area)
+holidays = get_holidays(area)
 pairs = get_free_time(weekends, holidays)[0]
 suggestions = []
 
