@@ -1,5 +1,5 @@
-from scraper import get_weekends, get_holidays, get_free_time, scrape_holidays
-from trello import create_board, create_list, create_card
+from modules.scraper import get_weekends, get_holidays, get_free_time, scrape_holidays
+from modules.trello import create_board, create_list, create_card
 
 
 # Retrieve all suggested vacation days

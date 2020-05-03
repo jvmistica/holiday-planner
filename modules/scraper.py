@@ -1,8 +1,8 @@
 import json
 import os
-import requests
 from datetime import datetime, date, timedelta
 from bs4 import BeautifulSoup
+import requests
 
 
 def scrape_holidays(url, area):
@@ -25,7 +25,8 @@ def scrape_holidays(url, area):
 
         for row in rows:
             cols = row.find_all("td")
-            holidate = datetime.strptime(row.find("time").get("datetime"), "%Y-%m-%d").strftime("%Y-%m-%d %A")
+            holidate = datetime.strptime(row.find("time").get("datetime"), "%Y-%m-%d")\
+                    .strftime("%Y-%m-%d %A")
             if holidate not in content:
                 events = []
             events.append({"event": cols[2].text})
