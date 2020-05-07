@@ -20,4 +20,4 @@ Run the main script:
 python holidays.py
 ```
 
-![Holidays](/images/trello-holidays.png)
+![Holidays](images/trello-holidays.PNG)
