@@ -29,7 +29,7 @@ def create_list(board_id, list_name, position):
     """
 
     url = f"https://api.trello.com/1/boards/{board_id}/lists"
-    querystring = {"name": list_name, "position": position, "key": key, "token": token}
+    querystring = {"name": list_name, "pos": position, "key": key, "token": token}
     response = requests.request("POST", url, params=querystring)
     list_id = response.json()["id"]
     return list_id
