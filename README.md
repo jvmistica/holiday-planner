@@ -20,4 +20,5 @@ Run the main script:
 python holidays.py
 ```
 
+It will automatically create a board named "Holidays" in your Trello including the lists and cards of suggested vacation dates.
 ![Holidays](images/trello-holidays.PNG)
