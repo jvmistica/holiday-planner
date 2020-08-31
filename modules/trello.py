@@ -44,7 +44,7 @@ def create_card(list_id, card_name):
     :returns: card_id
     """
 
-    url = f"https://api.trello.com/1/cards"
+    url = "https://api.trello.com/1/cards"
     querystring = {"name": card_name, "idList": list_id, "key": key, "token": token}
     response = requests.request("POST", url, params=querystring)
     card_id = response.json()["id"]

@@ -17,8 +17,9 @@ def scrape_holidays(url, area):
 
     filename = f"data/{area}.json"
     if area not in os.listdir("data"):
-        response = requests.get(url.replace("<area_name>", area))
-        print(url.replace("<area_name>", area))
+        url = url.replace("<area_name>", area)
+        print(f"Cannot find saved data for {area}. Scraping from {url}..")
+        response = requests.get(url)
         soup = BeautifulSoup(response.text, "lxml")
         rows = soup.find("tbody").find_all("tr")
         content = {}
@@ -45,7 +46,7 @@ def get_weekends(year=2020):
     """
 
     days_in_year = (date(year, 12, 31) - date(year, 1, 1)).days
-    weekends = list()
+    weekends = []
     for day in range(days_in_year + 1):
         weekend = date(year, 1, 1) + timedelta(days=day)
         weekend = weekend.strftime("%Y-%m-%d %A").split()
@@ -63,7 +64,7 @@ def get_holidays(area):
     """
 
     filename = f"data/{area}.json"
-    holidays = list()
+    holidays = []
     with open(filename, "r") as json_file:
         for holiday in json.load(json_file).get(area):
             holiday = datetime.strptime(holiday, "%Y-%m-%d %A").strftime("%Y-%m-%d")
