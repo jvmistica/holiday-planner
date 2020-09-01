@@ -10,13 +10,13 @@ def scrape_holidays(url, area):
     Scrapes a website for the holiday dates for a given country or state.
     Writes the scraped information to a JSON file in the data folder.
 
-    :param url: The website listing the holiday dates.
-    :param area: The country or state where the holidays occur.
+    :param url: The website listing the holiday dates
+    :param area: The country or state where the holidays occur
     :returns: None
     """
 
     filename = f"data/{area}.json"
-    if area not in os.listdir("data"):
+    if f"{area}.json" not in os.listdir("data"):
         url = url.replace("<area_name>", area)
         print(f"Cannot find saved data for {area}. Scraping from {url}..")
         response = requests.get(url)
@@ -42,7 +42,7 @@ def get_weekends(year=2020):
     Checks which dates the weekends fall for a given year.
 
     :param year:
-    :returns: The dates where Saturday and Sunday fall.
+    :returns: The dates where Saturday and Sunday fall
     """
 
     days_in_year = (date(year, 12, 31) - date(year, 1, 1)).days
@@ -59,8 +59,8 @@ def get_holidays(area):
     """
     Looks for holiday dates from the JSON file for the specified area.
 
-    :param area: The country or area to look for.
-    :returns: The holiday dates for the specified area.
+    :param area: The country or area to look for
+    :returns: The holiday dates for the specified area
     """
 
     filename = f"data/{area}.json"
@@ -76,9 +76,9 @@ def get_free_time(weekends, holidays):
     """
     Looks for all free time (holidays or weekends) and long weekends.
 
-    :param weekends: The date exact dates for Saturdays and Sundays.
-    :param holidays: The holiday dates.
-    :returns: A list containing all free times and all long weekends.
+    :param weekends: The date exact dates for Saturdays and Sundays
+    :param holidays: The holiday dates
+    :returns: A list containing all free times and all long weekends
     """
 
     holidays.extend(weekends)

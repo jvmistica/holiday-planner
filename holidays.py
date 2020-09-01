@@ -8,7 +8,7 @@ area = "malaysia"
 weekends = get_weekends()
 scrape_holidays(url, area)
 holidays = get_holidays(area)
-pairs = get_free_time(weekends, holidays)[0]
+pairs, long_weekends = get_free_time(weekends, holidays)
 suggestions = []
 
 for ndx, pair in enumerate(pairs):
@@ -36,7 +36,6 @@ for suggestion in suggestions:
     create_card(suggestions_list, "{0} days: {2} - {3} | {1} VL".format(*suggestion))
 
 # Get free time that requires no filing of vacation leaves
-long_weekends = get_free_time(weekends, holidays)[1]
 for from_date, to_date in long_weekends:
     vacation_days = (to_date - from_date).days + 1
     start = from_date.strftime("%m/%d")
